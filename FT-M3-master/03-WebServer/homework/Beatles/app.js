@@ -22,3 +22,52 @@ var beatles=[{
   profilePic:"http://cp91279.biography.com/BIO_Bio-Shorts_0_Ringo-Starr_SF_HD_768x432-16x9.jpg"
 }
 ]
+
+http.createServer((req, res) => {
+  if (req.url === "/") {
+    let html = fs.readFileSync(__dirname + "/index.html");
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.end(html);
+  } else if (req.url === "/api" || req.url === "/api/") {
+    //
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(beatles));
+  } else {
+    if (req.url.substring(0, 5) === "/api/") {
+      let urlName = req.url.substring(5).replace("%20", " ");
+      // [ {..}, {..}, {..}, {..}]
+      //    B
+      let beatle = beatles.find(
+        (artista) => artista.name.toLowerCase() === urlName.toLowerCase()
+      );
+      if (!beatle) {
+        error(res);
+      } else {
+        // SI SI EXISTE EL BEATLE
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(beatle));
+      }
+    } else {
+      // req.url -----> /John Lennon
+      let name = req.url.substring(1).replace("%20", " ");
+      let beatle = beatles.find(
+        (artista) => artista.name.toLowerCase() === name.toLowerCase()
+      );
+      let beatleHTML = fs.readFileSync(__dirname + "/beatle.html", "utf-8");
+      if (!beatle) {
+        error(res);
+      } else {
+        // SI EXISTE EL BEATLE
+        beatleHTML = beatleHTML
+          .replace("{titulo}", beatle.name)
+          .replace("{nombre}", beatle.name)
+          .replace("{nacimiento}", beatle.birthdate)
+          .replace("{img}", beatle.profilePic);
+        res.writeHead(200, { "Content-Type": "text/html" });
+        res.end(beatleHTML);
+      }
+    }
+  }
+})
+.listen(3001, console.log("Running on PORT:3001"));
+

@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "start": "nodemon start.js",
-    "test": "jest --detectOpenHandles"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
